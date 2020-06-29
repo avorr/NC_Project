@@ -1,0 +1,13 @@
+[Unit]
+Description=Prometheus exporter for PostgreSQL
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+WorkingDirectory={{ postgres_exporter_base_dir }}
+EnvironmentFile={{ postgres_exporter_env_file }}
+ExecStart={{ postgres_exporter_base_dir }}/postgres_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

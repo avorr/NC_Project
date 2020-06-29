@@ -1,0 +1,8 @@
+---
+- name: Install Jenkins on vm1
+  hosts: localhost
+  become: yes
+  remote_user: root
+
+  roles:
+    - install_jenkins

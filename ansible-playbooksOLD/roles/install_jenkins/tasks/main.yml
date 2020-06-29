@@ -1,0 +1,183 @@
+---
+# tasks file for install_jenkins
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: 'yes'
+    update_cache: 'yes'
+    cache_valid_time: '86400'
+
+- name: install JDK 11
+  apt:
+    name: openjdk-11-jdk
+    state: present
+
+- name: add tomcat group
+  group:
+    name: tomcat
+
+- name: add tomcat user
+  user:
+    name: tomcat
+    group: tomcat
+    home: /user/share/tomcat
+    createhome: 'no'
+
+- name: create /opt/tomcat directory
+  file:
+    path: /opt/tomcat
+    state: directory
+    mode: '0755'
+
+- name: download & unarchive
+  unarchive:
+    src: "{{ srcapache }}"
+    dest: /opt/tomcat
+    remote_src: 'yes'
+    extra_opts: [--strip-components=1]
+
+- name: Change ownership
+  file:
+    path: /opt/tomcat
+    owner: tomcat
+    group: tomcat
+    mode: "u+rwx,g+rx,o=rx"
+    recurse: 'yes'
+    state: directory
+
+- name: Copy Tomcat service from local to remote
+  copy:
+     src: tomcat.service
+     dest: /etc/systemd/system/
+     mode: '0755'
+
+- name: Download jenkins.repo
+  get_url:
+    url: "{{ urljenkins }}"
+    dest: /opt/tomcat/webapps/
+
+- name: Start tomcat service
+  systemd:
+    name: tomcat
+    state: started
+    enabled: 'true'
+    daemon_reload: 'true' 
+
+- name: wait for users.xml to appear 
+  wait_for:
+    path: "{{ pathconfxml }}/users/users.xml"
+    state: present     
+
+- name: wait for config.xml to appear 
+  wait_for:
+    path: "{{ pathconfxml }}/config.xml"
+    state: present
+  
+- name: Copy jenkins-cli from local to remote
+  copy:
+     src: jenkins-cli.jar
+     dest: /opt/
+     mode: '0755'
+
+- name: stop Tomcat service
+  systemd:
+    name: tomcat
+    state: stopped    
+
+- name: Delite config.xml
+  file:
+    path: "{{ pathconfxml }}/config.xml"
+    state: absent
+   
+- name: new user config for Jenkins
+  shell: cp {{ userconf }} $(realpath "{{ pathconfxml }}/users/admin_*")/config.xml
+
+- name: New config fot Jenkins
+  copy:
+     src: config.xml
+     dest: "{{ pathconfxml }}" 
+  
+- name: Start and enable Tomcat service
+  systemd:
+    name: tomcat
+    state: started
+    enabled: 'true'
+    daemon_reload: 'true'
+  
+- name: Run a script for wait Jenkins on Tomcat
+  script: wait_for_jenkins.py
+  args:
+    executable: python3
+
+- name: Install pipeline plugin
+  script: installpipeline.py
+  args:
+    executable: python3       
+ 
+- name: Install git plugin
+  script: installgit.py
+  args:
+    executable: python3
+        
+- name: Install ansible plugin
+  script: installansible.py
+  args:
+    executable: python3
+
+- name: Install ansicolor plugin
+  script: installansicolor.py
+  args:
+    executable: python3    
+  
+- name: Restart Jenkins
+  script: restartjenkins.py
+  args:
+    executable: python3
+
+- name: Run a script for wait Jenkins
+  script: wait_for_jenkins.py
+  args:
+    executable: python3
+            
+- name: Create Credentional
+  shell: "$(cat ~/.ssh/cli) {{ credentials }} < {{ files }}/sshcredentials.xml"
+  failed_when: 'false'
+ 
+- name: Create Job
+  shell: "$(cat ~/.ssh/cli) {{ pipeline }} < {{ files }}/job.xml"         
+  failed_when: 'false' 
+        
+- name: Restart jenkins
+  script: restartjenkins.py
+  args:
+    executable: python3
+
+- name: Clone hosts in tomcat 
+  copy:
+    src: hosts.txt
+    dest: /user/share/tomcat
+    owner: tomcat
+    group: tomcat
+    mode: '0755'    
+
+- name: create /tomcat/.ssh directory
+  file:
+    path: /user/share/tomcat/.ssh
+    state: directory
+    owner: tomcat
+    group: tomcat
+    mode: '0755'
+
+- name: Clone id_rsa in tomcat 
+  copy:
+    src: id_rsa
+    dest: /user/share/tomcat/.ssh/
+    owner: tomcat
+    group: tomcat
+    mode: '400'      
+  
+- name: Build Job
+  script: build.py
+  args:
+    executable: python3  
+
+

@@ -1,0 +1,8 @@
+---
+- name: Install Wildfly
+  hosts: vm2
+  become: yes
+  remote_user: root
+
+  roles:
+    - install_wildfly

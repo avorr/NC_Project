@@ -1,0 +1,14 @@
+---
+prometheus_ver: 2.17.2
+prometheus_name: prometheus-{{ prometheus_ver }}.linux-amd64
+prometheus_repo: https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_ver }}/{{ prometheus_name }}.tar.gz
+
+
+postgres_exporter_ver: v0.5.1
+postgres_exporter_name: postgres_exporter_{{ postgres_exporter_ver }}_linux-amd64
+postgres_exporter_repo: https://github.com/wrouesnel/postgres_exporter/releases/download/{{ postgres_exporter_ver }}/{{ postgres_exporter_name }}.tar.gz
+
+base_dir: /etc
+prometheus_base_dir: "{{ base_dir }}/{{ prometheus_name }}"
+postgres_exporter_base_dir: "{{ base_dir }}/{{ postgres_exporter_name }}"
+postgres_exporter_env_file: "{{ postgres_exporter_base_dir }}/postgres_exporter.env"

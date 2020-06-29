@@ -1,0 +1,8 @@
+---
+- name: Install Liferay
+  hosts: vm2
+  become: yes
+  remote_user: root
+
+  roles:
+    - install_liferay

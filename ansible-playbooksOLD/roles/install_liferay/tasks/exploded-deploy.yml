@@ -1,0 +1,21 @@
+---
+
+- name: Delete old WAR
+  file:
+    path: "{{ wildfly_dir }}/standalone/deployments/ROOT.war/"
+    state: absent
+
+- name: Directory WAR create if does not exist
+  file:
+    path: "{{ wildfly_dir }}/standalone/deployments/ROOT.war"
+    state: directory
+    mode: '0755'
+
+- name: Download and unzip Liferay Portal WAR
+  unarchive:
+    src: "{{ WAR_link }}"
+    dest: "{{ wildfly_dir }}/standalone/deployments/ROOT.war"
+    remote_src: yes
+
+- name: Set deploy to exploded
+  shell: '{{ wildfly_dir }}/bin/jboss-cli.sh --connect --command="/subsystem=deployment-scanner/scanner=default:write-attribute(name=auto-deploy-exploded, value=true)"'

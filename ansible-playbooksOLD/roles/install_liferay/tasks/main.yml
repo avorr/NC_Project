@@ -1,0 +1,31 @@
+---
+- name: Preparftion for installation
+  include: prepare-f-inst.yml
+
+- name: Change lines in standalone.xml w/ jboss-cli.sh
+  include: config.yml
+
+- name: Reload Wildfly
+  shell: '{{ wildfly_dir }}/bin/jboss-cli.sh --connect command=:reload'
+
+- name: Deploy exploded mode
+  include: exploded-deploy.yml
+
+- name: Wait for port 8080 to become open on the host
+  wait_for:
+    port: 8080
+    delay: 10
+
+- name: Reload Wildfly
+  shell: '{{ wildfly_dir }}/bin/jboss-cli.sh --connect command=:reload'
+
+# - name: Wait 600 seconds for target connection to become reachable/usable
+#   wait_for_connection:
+
+- name: Wait for port 8080 to become open on the host
+  wait_for:
+    port: 8080
+    delay: 10
+
+- name: Reboot WildFly
+  include: restart-wf.yml
