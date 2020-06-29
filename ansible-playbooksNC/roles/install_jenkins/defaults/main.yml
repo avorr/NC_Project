@@ -1,0 +1,30 @@
+---
+# defaults file for install_jenkins
+
+# - name: Waits for port 8080
+  #   wait_for:
+  #     host: localhost
+  #     port: 8080
+  #     delay: 20
+  #     state: present
+  
+   # register: create_job 
+    # failed_when:
+      # - "not 'already exists' in create_job.stderr"
+
+      # - name: clone hosts
+#   shell: cp /root/hosts.txt /user/share/tomcat/
+
+  # - name: wait for USERconfig.xml to appear 
+  #   wait_for:
+  #     path: $(realpath /user/share/tomcat/.jenkins/users/admin_*)/config.xml
+  #     state: present     
+ 
+  #- find /root/.jenkins/users/ -type f -name "test1.xml" -exec rm -rf {} \;  
+  #touch $(realpath /root/.jenkins/users/admin_*)/c.xml
+    
+  #/root/.jenkins/users/admin_15260383390361146691/config.xml
+  #  /root/.jenkins/config.xml
+  
+  #  - name: Jenkins startup on tomcat
+  #shell: java -Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -jar /opt/tomcat/webapps/jenkins.war --daemon

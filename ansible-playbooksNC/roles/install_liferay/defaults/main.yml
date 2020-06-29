@@ -1,0 +1,65 @@
+---
+# defaults file for install_liferay
+
+liferay_version: '7.2.1-ga2'
+
+dependencies_link: 'https://github.com/liferay/liferay-portal/releases/download/7.2.1-ga2/liferay-ce-portal-dependencies-7.2.1-ga2-20191111141448326.zip'
+
+dependencies_lst:
+  - com.liferay.petra.concurrent.jar
+  - com.liferay.petra.executor.jar
+  - com.liferay.petra.function.jar
+  - com.liferay.petra.io.jar
+  - com.liferay.petra.lang.jar
+  - com.liferay.petra.memory.jar
+  - com.liferay.petra.nio.jar
+  - com.liferay.petra.process.jar
+  - com.liferay.petra.reflect.jar
+  - com.liferay.petra.string.jar
+  - com.liferay.registry.api.jar
+  - hsql.jar
+  - portal-kernel.jar
+  - portlet.jar
+
+osgi_link: 'https://github.com/liferay/liferay-portal/releases/download/7.2.1-ga2/liferay-ce-portal-osgi-7.2.1-ga2-20191111141448326.zip'
+
+WAR_link: 'https://github.com/liferay/liferay-portal/releases/download/7.2.1-ga2/liferay-ce-portal-7.2.1-ga2-20191111141448326.war'
+
+dir_paths:
+  - "{{ wildfly_dir }}/modules/com/liferay/portal/main"
+  - "{{ liferay_home }}/osgi/"
+
+# General
+
+tmp_dir: /tmp
+liferay_home: '/etc/liferay'
+wildfly_name: wildfly
+wildfly_version: 17.0.1.Final
+wildfly_dir: '{{ liferay_home }}/{{ wildfly_name }}-{{ wildfly_version }}'
+
+# User
+wildfly_user: yunir
+wildfly-password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62383933623134653131656230633634343037383337383332313065636665383865356631616262
+          3538316164633231393465346137653466616261633838380a343333326230653064346164363664
+          34356333613961393963663035626136373030333165666462336538373133306431623935626166
+          3338313439353362640a303366323966663130366231333537356230653261306630616462653261
+          6638
+
+
+
+# Database
+dbdriver_version: postgresql-42.2.12
+dbdriver_filename: '{{ dbdriver_version }}.jar'
+dbdriver_url: https://jdbc.postgresql.org/download/{{ dbdriver_filename }}
+db_name: lportal
+db_user: lpuser
+db_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          32343163653831326264326434636431613963643638633661396633653232623361313830373965
+          3337623163313333333766346235383430396336393763320a343766323164336564653231626362
+          30373164613362613635636332636165643462623065643838663962326361623362306433316436
+          3362643438643839300a663262613063323237376437633035323330306435383836376639626234
+          3361
+db_ip: "{{ hostvars['vm3'].ansible_host }}"
