@@ -1,9 +1,0 @@
----
-- name: Monitoring setup
-  hosts: vm4
-  remote_user: root
-  become: yes
-
-  roles:
-  - prometheus
-  - grafana

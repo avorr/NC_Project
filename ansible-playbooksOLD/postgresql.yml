@@ -1,8 +1,0 @@
----
-- name: PostgreSQL setup
-  hosts: vm3
-  remote_user: root
-  become: yes
-
-  roles:
-  - postgresql
